@@ -2,7 +2,7 @@ $prtgProbes = "Server1","Server2","Server3"
 Function Update-ServiceCredentials {
     Param (
     [Parameter(Mandatory)][String]$ServiceName,
-    [Parameter(Mandatory)][ValidateScript({$_ -match ‘Container’})][String]$Username, # Validate against regex for User@Domain.  Can we validate username?
+    [Parameter(Mandatory)][ValidateScript({$_ -match "[\w\.]+@[\w\.]+"})][String]$Username, # Validate against regex for User@Domain.  Can we validate username?
     [Parameter(Mandatory,DontShow)][SecureString]$Password,
     $ComputerName
     )
