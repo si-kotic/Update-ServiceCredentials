@@ -6,25 +6,28 @@ Function Update-ServiceCredentials {
     [Parameter(Mandatory,DontShow)][SecureString]$Password,
     $ComputerName
     )
-    Function UpdateServiceCredentials {
-        $service = Get-WmiObject -Class Win32_Service -Filter "name='$ServiceName'"
-        $updateResult = $service.change($null,$null,$null,$null,$null,$null,$Username,$Password) # If ReturnValue is 0 then success!
-        IF ($updateResult.ReturnValue -eq 0) {
-            Write-Verbose -Message "CREDENTIALS SUCCESSFULL UPDATED"
-            Write-Verbose -Message "RESTARTING SERVICE: $ServiceName"
-            Restart-Service $ServiceName
+    $UnsecurePassword = (New-Object PSCredential "user",$Password).GetNetworkCredential().Password
+    Function UpServCred {
+        IF (Get-Service $ServiceName) {
+            $service = Get-WmiObject -Class Win32_Service -Filter "name='$ServiceName'"
+            $updateResult = $service.change($null,$null,$null,$null,$null,$null,$Username,$UnsecurePassword) # If ReturnValue is 0 then success!
+            IF ($updateResult.ReturnValue -eq 0) {
+                Write-Verbose -Message "CREDENTIALS SUCCESSFULL UPDATED"
+                Write-Verbose -Message "RESTARTING SERVICE: $ServiceName"
+                Restart-Service $ServiceName
+            } ELSE {
+                Write-Verbose -Message "FAILED TO UPDATE CREDENTIALS"
+                Break;
+            }
+            $service = Get-WmiObject -Class Win32_Service -Filter "name='$ServiceName'"
+            $service | Format-Table Name,StartMode,State,Status,PSComputerName
         } ELSE {
-            Write-Verbose -Message "FAILED TO UPDATE CREDENTIALS"
-            Break;
+            Write-Error -Exception "$ServiceName DOES NOT EXIST"
         }
-        $service = Get-WmiObject -Class Win32_Service -Filter "name='$ServiceName'"
-        $service | Format-Table Name,StartMode,State,Status,PSComputerName
     }
     IF ($ComputerName) {
         Invoke-Command -ComputerName $ComputerName -ScriptBlock {
-            UpdateServiceCredentials
+            UpServCred
         }
-    } ELSE {
-        UpdateServiceCredentials
     }
 }
