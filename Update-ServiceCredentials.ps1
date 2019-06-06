@@ -1,18 +1,30 @@
 $prtgProbes = "Server1","Server2","Server3"
-Update-ServiceCredentials {
+Function Update-ServiceCredentials {
     Param (
-        $ServiceName,
-        $Username, # Validate against regex for User@Domain.  Can we validate username?
-        $Password, # Make SecureString and Hidden
-        $ComputerName
+    [Parameter(Mandatory)][String]$ServiceName,
+    [Parameter(Mandatory)][ValidateScript({$_ -match ‘Container’})][String]$Username, # Validate against regex for User@Domain.  Can we validate username?
+    [Parameter(Mandatory,DontShow)][SecureString]$Password,
+    $ComputerName
     )
-    $prtgProbes | Foreach-Object {
-        Invoke-Command -ComputerName $_ -ScriptBlock {
-            $service = Get-WmiObject -Class Win32_Service -Filter "name='PRTGProbeService'"
-            $service.change($null,$null,$null,$null,$null,$null,$null,"lost-wmcXPQs") # If ReturnValue is 0 then success!
-            Restart-Service PRTGProbeService
-            $service = Get-WmiObject -Class Win32_Service -Filter "name='PRTGProbeService'"
-            $service | Format-Table Name,StartMode,State,Status,PSComputerName
+    Function UpdateServiceCredentials {
+        $service = Get-WmiObject -Class Win32_Service -Filter "name='$ServiceName'"
+        $updateResult = $service.change($null,$null,$null,$null,$null,$null,$Username,$Password) # If ReturnValue is 0 then success!
+        IF ($updateResult.ReturnValue -eq 0) {
+            Write-Verbose -Message "CREDENTIALS SUCCESSFULL UPDATED"
+            Write-Verbose -Message "RESTARTING SERVICE: $ServiceName"
+            Restart-Service $ServiceName
+        } ELSE {
+            Write-Verbose -Message "FAILED TO UPDATE CREDENTIALS"
+            Break;
         }
+        $service = Get-WmiObject -Class Win32_Service -Filter "name='$ServiceName'"
+        $service | Format-Table Name,StartMode,State,Status,PSComputerName
+    }
+    IF ($ComputerName) {
+        Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+            UpdateServiceCredentials
+        }
+    } ELSE {
+        UpdateServiceCredentials
     }
 }
