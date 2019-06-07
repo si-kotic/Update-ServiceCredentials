@@ -96,3 +96,11 @@ Name             StartMode State   Status PSComputerName
 ----             --------- -----   ------ --------------
 PRTGProbeService Automatic Running OK     Server4
 ```
+```
+C:\>Update-ServiceCredentials -ServiceName "PRTGProbeService" -WhatIf
+
+cmdlet Update-ServiceCredentials at command pipeline position 1
+Supply values for the following parameters:
+Password: ******
+What if: Performing the operation "Update-ServiceCredentials" on target "PRTGProbeService".
+```
