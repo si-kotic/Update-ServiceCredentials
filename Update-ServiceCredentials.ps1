@@ -1,4 +1,3 @@
-$prtgProbes = "Server1","Server2","Server3"
 Function Update-ServiceCredentials {
     Param (
     [Parameter(Mandatory)][String]$ServiceName,
