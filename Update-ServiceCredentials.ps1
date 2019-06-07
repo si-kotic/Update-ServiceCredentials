@@ -20,13 +20,13 @@ Function Update-ServiceCredentials {
             }
             $service = Get-WmiObject -Class Win32_Service -Filter "name='$ServiceName'"
             $service | Format-Table Name,StartMode,State,Status,PSComputerName
-        } ELSE {
-            Write-Error -Exception "$ServiceName DOES NOT EXIST"
         }
     }
     IF ($ComputerName) {
         Invoke-Command -ComputerName $ComputerName -ScriptBlock {
             UpServCred
         }
+    } ELSE {
+        UpServCred
     }
 }
