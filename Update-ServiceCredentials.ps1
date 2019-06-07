@@ -1,7 +1,7 @@
 Function Update-ServiceCredentials {
     Param (
     [Parameter(Mandatory)][String]$ServiceName,
-    [Parameter(Mandatory)][ValidateScript({$_ -match "[\w\.]+@[\w\.]+"})][String]$Username, # Validate against regex for User@Domain.  Can we validate username?
+    [ValidateScript({$_ -match "[\w\.]+@[\w\.]+"})][String]$Username, # Validate against regex for User@Domain.  Can we validate username?
     [Parameter(Mandatory,DontShow)][SecureString]$Password,
     $ComputerName
     )
