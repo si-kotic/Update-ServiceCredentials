@@ -1,4 +1,8 @@
 Function Update-ServiceCredentials {
+    <#
+    .LINK
+    https://github.com/si-kotic/Update-ServiceCredentials
+    #>
     Param (
     [Parameter(Mandatory)][String]$ServiceName,
     [ValidateScript({$_ -match "[\w\.]+@[\w\.]+"})][String]$Username, # Validate against regex for User@Domain.  Can we validate username?
