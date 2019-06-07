@@ -69,3 +69,30 @@ Name             StartMode State   Status PSComputerName
 ----             --------- -----   ------ --------------
 PRTGProbeService Automatic Running OK     PrtgServer
 ```
+```
+$prtgProbes = "Server1","Server2","Server3","Server4"
+$prtgProbes | Foreach-Object {
+    Update-ServiceCredentials -ServiceName PRTGProbeService -ComputerName $_
+}
+Supply values for the following parameters:
+Password: *******
+
+Name             StartMode State   Status PSComputerName
+----             --------- -----   ------ --------------
+PRTGProbeService Automatic Running OK     Server1
+
+Get-Service : Cannot find any service with service name 'PRTGProbeService'.
+At line:10 char:13
++         IF (Get-Service $ServiceName) {
++             ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (PRTGProbeService:String) [Get-Service], ServiceCommandException
+    + FullyQualifiedErrorId : NoServiceFoundForGivenName,Microsoft.PowerShell.Commands.GetServiceCommand
+
+Name             StartMode State   Status PSComputerName
+----             --------- -----   ------ --------------
+PRTGProbeService Automatic Running OK     Server3
+
+Name             StartMode State   Status PSComputerName
+----             --------- -----   ------ --------------
+PRTGProbeService Automatic Running OK     Server4
+```
